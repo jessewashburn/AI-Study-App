@@ -1,4 +1,4 @@
-# AI Study App (work in progress)
+# AI Study App
 
 This is an application for creating study guides using OpenAI's GPT-3 and text-to-speech (TTS) capabilities. It allows users to input study notes and generate a detailed study guide from them.
 
