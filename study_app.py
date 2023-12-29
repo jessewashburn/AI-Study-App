@@ -18,6 +18,12 @@ engine = pyttsx3.init()
 engine_lock = threading.Lock()
 
 def get_study_guide(notes):
+    """
+    Retrieve a study guide based on input notes and display it.
+
+    Args:
+        notes (str): The input notes provided by the user.
+    """
     global study_guide, parts, current_part_index
     try:
         display_area.delete('1.0', tk.END)
@@ -43,8 +49,10 @@ def get_study_guide(notes):
 
 
 
-
 def speak_text():
+    """
+    Speak the study guide text starting from the current part index.
+    """
     global is_speaking, current_part_index, parts
     engine_lock.acquire()
     try:
@@ -58,26 +66,42 @@ def speak_text():
         engine_lock.release()
 
 def start_speaking():
+    """
+    Start speaking the study guide.
+    """
     global is_speaking
     if parts and not is_speaking:
         is_speaking = True
         threading.Thread(target=speak_text).start()
 
 def stop_speaking():
+    """
+    Stop speaking the study guide.
+    """
     global is_speaking
     is_speaking = False
+    engine.stop()  # Stop the TTS engine
 
 def fast_forward():
+    """
+    Fast forward to the next part of the study guide.
+    """
     global current_part_index, parts
     current_part_index = min(len(parts), current_part_index + 1)
     stop_speaking()
 
 def rewind():
+    """
+    Rewind to the previous part of the study guide.
+    """
     global current_part_index
     current_part_index = max(0, current_part_index - 1)
     stop_speaking()
 
 def on_closing():
+    """
+    Handle the closing of the application window.
+    """
     global is_speaking
     is_speaking = False
     root.destroy()
