@@ -28,7 +28,7 @@ def get_study_guide(notes):
     try:
         display_area.delete('1.0', tk.END)
         display_area.insert(tk.INSERT, "Processing...")
-        root.update_idletasks()  # Force update of the UI
+        root.update_idletasks()  
 
         full_prompt = "Make a detailed study guide based on the following notes:\n" + notes
         response = openai.completions.create(
@@ -42,7 +42,6 @@ def get_study_guide(notes):
 
         display_area.delete('1.0', tk.END)
         display_area.insert(tk.INSERT, study_guide)
-        display_area.insert(tk.INSERT, "\n\nProcessing Complete.")  
     except Exception as e:
         print("An error occurred:", e)
         display_area.insert(tk.INSERT, "\n\nAn error occurred. Please try again.")  
@@ -80,7 +79,7 @@ def stop_speaking():
     """
     global is_speaking
     is_speaking = False
-    engine.stop()  # Stop the TTS engine
+    engine.stop() 
 
 def fast_forward():
     """
@@ -158,7 +157,5 @@ rw_button.pack(side=tk.LEFT)
 
 # Closing protocol
 root.protocol("WM_DELETE_WINDOW", on_closing)
-
-# ... [rest of your functions] ...
 
 root.mainloop()
