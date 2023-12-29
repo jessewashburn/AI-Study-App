@@ -20,25 +20,28 @@ engine_lock = threading.Lock()
 def get_study_guide(notes):
     global study_guide, parts, current_part_index
     try:
-        # Show "Processing..." message
         display_area.delete('1.0', tk.END)
         display_area.insert(tk.INSERT, "Processing...")
+        root.update_idletasks()  # Force update of the UI
 
         full_prompt = "Make a detailed study guide based on the following notes:\n" + notes
         response = openai.completions.create(
-            model="text-davinci-003",
+            model="gpt-3.5-turbo-instruct",
             prompt=full_prompt,
             max_tokens=500
         )
         study_guide = response.choices[0].text
-        parts = re.split(r'\.\s+', study_guide)  # Split text into parts
+        parts = re.split(r'\.\s+', study_guide)
         current_part_index = 0
 
-        # Update display with the generated study guide
         display_area.delete('1.0', tk.END)
         display_area.insert(tk.INSERT, study_guide)
+        display_area.insert(tk.INSERT, "\n\nProcessing Complete.")  
     except Exception as e:
         print("An error occurred:", e)
+        display_area.insert(tk.INSERT, "\n\nAn error occurred. Please try again.")  
+
+
 
 
 def speak_text():
@@ -85,28 +88,53 @@ engine.setProperty('rate', 150)
 # Tkinter GUI setup
 root = tk.Tk()
 root.title("Study Guide with TTS")
+root.state('zoomed')  # Maximized window
 
-notes_input = tk.Entry(root, width=50)
-notes_input.pack()
+# Create frames
+top_buffer = tk.Frame(root, height=20)  # Buffer at the top
+top_frame = tk.Frame(root)
+bottom_frame = tk.Frame(root)
+bottom_buffer = tk.Frame(root, height=20)  # Buffer at the bottom
+top_buffer.pack(side=tk.TOP, fill=tk.X)
+top_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+bottom_frame.pack(side=tk.BOTTOM, fill=tk.X)
+bottom_buffer.pack(side=tk.BOTTOM, fill=tk.X)
 
-process_button = tk.Button(root, text="Process Notes", command=lambda: get_study_guide(notes_input.get()))
-process_button.pack()
+# Top frame layout
+left_frame = tk.Frame(top_frame)
+right_frame = tk.Frame(top_frame)
+left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
-display_area = scrolledtext.ScrolledText(root, wrap=tk.WORD, height=10)
-display_area.pack()
+# Add labels
+label_notes = tk.Label(left_frame, text="Input Notes")
+label_notes.pack()
+label_study_guide = tk.Label(right_frame, text="Study Guide")
+label_study_guide.pack()
 
-play_button = tk.Button(root, text="Play", command=start_speaking)
-play_button.pack()
+# Input and Display areas
+notes_input = tk.Text(left_frame)
+notes_input.pack(fill="both", expand=True)
+display_area = scrolledtext.ScrolledText(right_frame, wrap=tk.WORD)
+display_area.pack(fill="both", expand=True)
 
-stop_button = tk.Button(root, text="Stop", command=stop_speaking)
-stop_button.pack()
+# Buttons in Bottom Frame
+button_frame = tk.Frame(bottom_frame)  # Frame to contain buttons for centering
+button_frame.pack()
+process_button = tk.Button(button_frame, text="Process Notes", command=lambda: get_study_guide(notes_input.get("1.0", tk.END)))
+process_button.pack(side=tk.LEFT)
+play_button = tk.Button(button_frame, text="Play", command=start_speaking)
+play_button.pack(side=tk.LEFT)
+stop_button = tk.Button(button_frame, text="Stop", command=stop_speaking)
+stop_button.pack(side=tk.LEFT)
+ff_button = tk.Button(button_frame, text="Fast Forward 15s", command=fast_forward)
+ff_button.pack(side=tk.LEFT)
+rw_button = tk.Button(button_frame, text="Rewind 15s", command=rewind)
+rw_button.pack(side=tk.LEFT)
 
-ff_button = tk.Button(root, text="Fast Forward 15s", command=fast_forward)
-ff_button.pack()
-
-rw_button = tk.Button(root, text="Rewind 15s", command=rewind)
-rw_button.pack()
-
+# Closing protocol
 root.protocol("WM_DELETE_WINDOW", on_closing)
+
+# ... [rest of your functions] ...
 
 root.mainloop()
