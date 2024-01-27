@@ -17,7 +17,7 @@ This application uses OpenAI's GPT-3 and text-to-speech (TTS) capabilities to cr
  
 **Backend Setup**
 
-The backend is a Flask application that interfaces with the OpenAI API. To set it up:
+The backend is a Flask application (StudyAppBackend.py)that interfaces with the OpenAI API. To set it up:
 
 1. Clone the repository and navigate to the backend directory.
 2. Install the required packages:
